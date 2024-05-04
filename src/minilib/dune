@@ -1,0 +1,5 @@
+(executable
+ (name main)
+ (public_name belenios-minilib)
+ (package belenios-minilib)
+ (libraries str cmdliner belenios-platform-native belenios-lib))

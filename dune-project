@@ -43,6 +43,14 @@
   (belenios-lib (= :version))))
 
 (package
+  (name belenios-minilib)
+  (synopsis "Belenios minilib")
+  (depends
+   (cmdliner (>= 1.1.0))
+   (belenios-platform-native (= :version))
+   (belenios-lib (= :version))))
+
+(package
  (name belenios-server)
  (synopsis "Belenios server")
  (depends
