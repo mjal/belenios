@@ -22,3 +22,8 @@
 include Signatures.GROUP
 
 val selfcheck : unit -> bool
+
+(*
+module type F = Signatures_core.FIELD
+val to_coordinates : (F.t * F.t * F.t * 'a) -> Z.t * Z.t
+*)
