@@ -237,6 +237,14 @@ let to_ints =
 
 let hash prefix xs =
   let x = prefix ^ map_and_concat_with_commas to_string xs in
+  let () = Printf.printf "Here x : %s\n" x in
+  let () = Printf.printf "Here s : %s\n" (sha256_hex x) in
+  let () = Printf.printf "Here l : %s\n" (Z.to_hex   l) in
+
+  let () = Printf.printf "Here reduced s : %s\n"
+    (Z.to_hex (Z.of_string (Zq.to_string (Zq.reduce_hex (sha256_hex x)))))
+  in
+
   Zq.reduce_hex (sha256_hex x)
 
 let hash_to_int p =

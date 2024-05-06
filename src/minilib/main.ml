@@ -26,6 +26,7 @@ let main _ballot =
   | Some { s_hash; s_proof = { challenge; response } } ->
     let challenge_int =  (G.Zq.to_string challenge) in
     let response_int  =  (G.Zq.to_string response) in
+    Printf.printf "\n";
     Printf.printf "Challenge : %s\n" challenge_int;
     Printf.printf "Response  : %s\n" response_int;
 
@@ -40,30 +41,38 @@ let main _ballot =
     (* TODO: parse credential to a group element *)
     let credential = G.of_string credential in
 
-    let (a, b) = (Ed25519_copy.to_coordinates Ed25519_copy.g) in
-    Ed25519_copy.F.(
-      Printf.printf "G a: %s\n" (to_string a);
-      Printf.printf "G b: %s\n" (to_string b);
-    );
-
-    let ed_credential = Ed25519_copy.of_string (G.to_string ballot.credential) in
-    let (a, b) = (Ed25519_copy.to_coordinates ed_credential) in
-    Ed25519_copy.F.(
-      Printf.printf "Credential a: %s\n" (to_string a);
-      Printf.printf "Credential b: %s\n" (to_string b);
-
-      Printf.printf "Credential a (hex): %s\n" (Z.format "%x" (Z.of_string (to_string a)));
-      Printf.printf "Credential b (hex): %s\n" (Z.format "%x" (Z.of_string (to_string b)));
-
-      Printf.printf "g ** response: %s\n" G.(to_string (g **~ response));
-      Printf.printf "credential ** challenge: %s\n" G.(to_string (credential **~ challenge));
-    );
-
     let commitment = G.(
      (g **~ response) *~ (credential **~ challenge)
     ) in
      let _ = s_hash in
      let () = Printf.printf "Commitment (ou A?) : %s\n" (G.to_string commitment) in
+     let make_sig_prefix hash = "sig|" ^ hash ^ "|" in
+     let prefix = make_sig_prefix s_hash in
+     let () = Printf.printf "hashedString : %s\n" (prefix ^ G.to_string commitment) in
+     (*let x = prefix ^ map_and_concat_with_commas to_string [| commitment |] in*)
+    
+     let _aa = Ed25519_copy.hash prefix [| (Ed25519_copy.of_string (G.to_string commitment)) |] in
+     let recomputedChallenge = G.hash prefix [| commitment |] in
+     let () = Printf.printf "recomputedChallenge : %s\n"
+       (Z.format "%x" (Z.of_string (G.Zq.to_string recomputedChallenge))) in
+
+    let hashedString =
+      Cryptokit.(
+      "1"
+      |> hash_string (Hash.sha256 ())
+      |> transform_string (Hexa.encode ())
+    ) in
+    let () = Printf.printf "hashedString : %s\n" hashedString
+    (* hashedString : 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b *)
+
+    in
+
+    let hh = Cryptokit.hash_string (Cryptokit.Hash.sha256 ()) "1" in
+    let h2 = Cryptokit.transform_string (Cryptokit.Hexa.encode ()) hh in
+    let () = Printf.printf "Test hash : %s\n" hh in
+    let () = Printf.printf "Test h2   : %s\n" h2 in
+
+    let () = Printf.printf "Test h2   : %s\n" h2 in
     ()
   | None -> ()
 
